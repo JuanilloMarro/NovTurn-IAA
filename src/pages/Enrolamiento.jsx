@@ -22,6 +22,17 @@ function urlDelQr(qr) {
     return qr.startsWith('data:') ? qr : `data:image/svg+xml;utf-8,${encodeURIComponent(qr)}`;
 }
 
+/** Lee el claim `aal` del access token, que es lo que evalúa el servidor. */
+function claimAal(accessToken) {
+    if (!accessToken) return null;
+    try {
+        const carga = accessToken.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+        return JSON.parse(atob(carga.padEnd(carga.length + ((4 - (carga.length % 4)) % 4), '='))).aal ?? null;
+    } catch {
+        return null;
+    }
+}
+
 export default function Enrolamiento() {
     const [sesion, setSesion] = useState(undefined); // undefined = cargando
     const [factores, setFactores] = useState({ totp: [], passkeys: [] });
@@ -48,23 +59,30 @@ export default function Enrolamiento() {
     // "AAL2 session is required to manage passkeys when MFA is enabled".
     // Sin este paso, quien enrola el TOTP antes que la biometría queda trabado.
     const [aal, setAal] = useState(null);
+    const [aalDelToken, setAalDelToken] = useState(null);
     const [factorElegido, setFactorElegido] = useState('');
     const [codigoAal, setCodigoAal] = useState('');
     const [errorAal, setErrorAal] = useState('');
     const [elevando, setElevando] = useState(false);
 
     const refrescar = useCallback(async () => {
-        const [{ data: mfa }, { data: pk }, { data: nivel }] = await Promise.all([
+        const [{ data: mfa }, { data: pk }, { data: nivel }, { data: ses }] = await Promise.all([
             supabase.auth.mfa.listFactors(),
             // `passkey.list()` también exige AAL2 con MFA activo; si falla, se
             // deja la lista vacía y la pantalla pide la elevación.
             supabase.auth.passkey.list(),
             supabase.auth.mfa.getAuthenticatorAssuranceLevel(),
+            supabase.auth.getSession(),
         ]);
         // `passkey.list()` devuelve el arreglo directo (PasskeyListItem[]),
         // no un objeto envolvente. Verificado en los tipos de auth-js 2.111.0.
         setFactores({ totp: mfa?.totp ?? [], passkeys: Array.isArray(pk) ? pk : [] });
         setAal(nivel ?? null);
+        // `getAuthenticatorAssuranceLevel()` decodifica el JWT guardado, no
+        // pregunta al servidor. Leemos el claim `aal` del token que realmente
+        // se envía, que es lo que el servidor va a evaluar: si los dos no
+        // coinciden, el problema es de propagación del token y no de nivel.
+        setAalDelToken(claimAal(ses?.session?.access_token));
         setFactorElegido((prev) =>
             prev || (mfa?.totp ?? []).find((f) => f.status === 'verified')?.id || '');
     }, []);
@@ -99,6 +117,14 @@ export default function Enrolamiento() {
         setElevando(false);
 
         if (error) { setErrorAal('Código incorrecto o vencido.'); return; }
+
+        // `mfa.verify()` emite un token nuevo con `aal: aal2`, pero el cliente
+        // puede seguir enviando el anterior hasta que le toque renovarlo. Los
+        // docs de MFA advierten justo esto para el caso inverso (bajar de nivel
+        // al desenrolar) y recomiendan `refreshSession()` para que el cambio
+        // sea inmediato. Sin esto, el servidor sigue viendo una sesión AAL1 y
+        // rechaza el registro de la passkey aunque la pantalla ya diga AAL2.
+        await supabase.auth.refreshSession();
 
         setCodigoAal('');
         showSuccessToast('Sesión elevada', 'Ahora podés registrar la biometría');
@@ -197,7 +223,16 @@ export default function Enrolamiento() {
             showSuccessToast('Biometría registrada', data?.friendly_name ?? 'Credencial creada');
             refrescar();
         } catch (err) {
-            setErrorPasskey(mensajeDeError(err));
+            // Se muestra también el mensaje crudo: los errores del servidor de
+            // passkeys son específicos y traducirlos esconde justo el dato útil.
+            const traducido = mensajeDeError(err);
+            setErrorPasskey(
+                err?.message && err.message !== traducido
+                    ? `${traducido} — respuesta del servidor: "${err.message}"`
+                    : traducido,
+            );
+            // Puede que el token haya caducado o cambiado de nivel; se relee.
+            refrescar();
         } finally {
             setOcupadoPasskey(false);
         }
@@ -224,7 +259,7 @@ export default function Enrolamiento() {
         return (
             <TarjetaAcceso
                 titulo="Registro de factores"
-                descripcion="Entrá con tu contraseña para registrar el autenticador y la biometría. Basta una sesión AAL1."
+                descripcion="Entrá con tu contraseña para registrar tus factores. Si la cuenta ya tiene un autenticador, la biometría pedirá además el código."
                 pie={<Link to="/acceso" className="text-[11px] font-semibold text-navy-700/50 hover:text-navy-900 transition-colors">Ir al proceso de acceso</Link>}
             >
                 <form onSubmit={entrar} className="space-y-5">
@@ -322,9 +357,21 @@ export default function Enrolamiento() {
 
                 {/* ── Inherencia ───────────────────────────────────────────── */}
                 <section>
-                    <div className="flex items-center gap-2 mb-3">
+                    <div className="flex items-center gap-2 mb-3 flex-wrap">
                         <Fingerprint size={15} strokeWidth={2.5} className="text-navy-900" />
                         <h3 className="text-[12px] font-bold text-navy-900">Algo que soy · biometría (passkey)</h3>
+                        {aal && (
+                            <span className="ml-auto flex items-center gap-1">
+                                <Badge tone={aalDelToken === 'aal2' ? 'exito' : 'aviso'}>
+                                    token {(aalDelToken ?? 'aal1').toUpperCase()}
+                                </Badge>
+                                {aalDelToken !== aal.currentLevel && (
+                                    <Badge tone="fallo">
+                                        sesión {(aal.currentLevel ?? 'aal1').toUpperCase()}
+                                    </Badge>
+                                )}
+                            </span>
+                        )}
                     </div>
 
                     {factores.passkeys.map((p) => (
