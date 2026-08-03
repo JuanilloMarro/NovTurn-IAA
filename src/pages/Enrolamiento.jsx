@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Check, Fingerprint, Lock, Mail, Smartphone, Trash2 } from 'lucide-react';
+import { ArrowLeft, Check, Fingerprint, Lock, Mail, ShieldAlert, Smartphone, Trash2 } from 'lucide-react';
 import { supabase } from '../config/supabase';
 import { crearCredencialBiometrica, mensajeDeError, soportaWebAuthn } from '../config/webauthn';
 import TarjetaAcceso from '../components/acceso/TarjetaAcceso';
@@ -42,14 +42,31 @@ export default function Enrolamiento() {
     const [errorPasskey, setErrorPasskey] = useState('');
     const [ocupadoPasskey, setOcupadoPasskey] = useState(false);
 
+    // Elevación a AAL2. PLAN.md §7 daba por hecho que una sesión AAL1 alcanza
+    // para toda la pantalla, y no es así: en cuanto la cuenta tiene un TOTP
+    // verificado, GoTrue responde
+    // "AAL2 session is required to manage passkeys when MFA is enabled".
+    // Sin este paso, quien enrola el TOTP antes que la biometría queda trabado.
+    const [aal, setAal] = useState(null);
+    const [factorElegido, setFactorElegido] = useState('');
+    const [codigoAal, setCodigoAal] = useState('');
+    const [errorAal, setErrorAal] = useState('');
+    const [elevando, setElevando] = useState(false);
+
     const refrescar = useCallback(async () => {
-        const [{ data: mfa }, { data: pk }] = await Promise.all([
+        const [{ data: mfa }, { data: pk }, { data: nivel }] = await Promise.all([
             supabase.auth.mfa.listFactors(),
+            // `passkey.list()` también exige AAL2 con MFA activo; si falla, se
+            // deja la lista vacía y la pantalla pide la elevación.
             supabase.auth.passkey.list(),
+            supabase.auth.mfa.getAuthenticatorAssuranceLevel(),
         ]);
         // `passkey.list()` devuelve el arreglo directo (PasskeyListItem[]),
         // no un objeto envolvente. Verificado en los tipos de auth-js 2.111.0.
-        setFactores({ totp: mfa?.totp ?? [], passkeys: pk ?? [] });
+        setFactores({ totp: mfa?.totp ?? [], passkeys: Array.isArray(pk) ? pk : [] });
+        setAal(nivel ?? null);
+        setFactorElegido((prev) =>
+            prev || (mfa?.totp ?? []).find((f) => f.status === 'verified')?.id || '');
     }, []);
 
     useEffect(() => {
@@ -58,6 +75,35 @@ export default function Enrolamiento() {
             if (data.session) refrescar();
         });
     }, [refrescar]);
+
+    // La sesión necesita elevarse cuando Supabase dice que el siguiente nivel
+    // posible es superior al actual: eso significa que hay MFA por cumplir.
+    const necesitaElevar = !!aal && aal.nextLevel === 'aal2' && aal.currentLevel !== 'aal2';
+    const totpVerificados = factores.totp.filter((f) => f.status === 'verified');
+
+    async function elevarSesion(e) {
+        e.preventDefault();
+        setElevando(true);
+        setErrorAal('');
+
+        const { data: reto, error: errReto } = await supabase.auth.mfa.challenge({
+            factorId: factorElegido,
+        });
+        if (errReto) { setElevando(false); setErrorAal(errReto.message); return; }
+
+        const { error } = await supabase.auth.mfa.verify({
+            factorId: factorElegido,
+            challengeId: reto.id,
+            code: codigoAal.trim(),
+        });
+        setElevando(false);
+
+        if (error) { setErrorAal('Código incorrecto o vencido.'); return; }
+
+        setCodigoAal('');
+        showSuccessToast('Sesión elevada', 'Ahora podés registrar la biometría');
+        refrescar();
+    }
 
     async function entrar(e) {
         e.preventDefault();
@@ -295,13 +341,60 @@ export default function Enrolamiento() {
 
                     <AvisoError>{errorPasskey}</AvisoError>
 
-                    <button
-                        onClick={registrarPasskey}
-                        disabled={ocupadoPasskey}
-                        className="w-full bg-white/60 hover:bg-white border border-white/70 hover:border-navy-300 text-navy-700 text-[12px] font-bold py-3 rounded-[18px] transition-all disabled:opacity-50"
-                    >
-                        {ocupadoPasskey ? 'Esperando al autenticador…' : 'Registrar biometría'}
-                    </button>
+                    {necesitaElevar ? (
+                        // Con MFA activo, Supabase exige AAL2 para gestionar passkeys.
+                        // Se eleva acá mismo con el código del autenticador.
+                        <form onSubmit={elevarSesion} className="bg-amber-50/70 border border-amber-200/70 rounded-[20px] p-5 space-y-4">
+                            <div className="flex items-start gap-2.5">
+                                <ShieldAlert size={15} strokeWidth={2.5} className="text-amber-600 shrink-0 mt-0.5" />
+                                <p className="text-[11px] text-amber-800 font-medium leading-relaxed">
+                                    Tu cuenta ya tiene un autenticador, así que registrar la biometría
+                                    exige una sesión de nivel <span className="font-bold">AAL2</span>.
+                                    Ingresá el código para elevarla de {(aal.currentLevel ?? 'aal1').toUpperCase()} a AAL2.
+                                </p>
+                            </div>
+
+                            {totpVerificados.length > 1 && (
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-navy-900 tracking-wide ml-1 opacity-50 block">
+                                        ¿Cuál de tus autenticadores estás usando?
+                                    </label>
+                                    <select
+                                        value={factorElegido}
+                                        onChange={(e) => setFactorElegido(e.target.value)}
+                                        className="w-full bg-white/70 border border-white/80 rounded-[16px] px-4 py-3 text-[12px] font-semibold text-navy-900 outline-none focus:ring-1 focus:ring-white"
+                                    >
+                                        {totpVerificados.map((f) => (
+                                            <option key={f.id} value={f.id}>
+                                                {f.friendly_name || `Autenticador ${f.id.slice(0, 8)}`}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
+
+                            <AvisoError>{errorAal}</AvisoError>
+
+                            <CampoTexto
+                                etiqueta="Código de seis dígitos" icono={Smartphone} type="text"
+                                inputMode="numeric" maxLength={6} required placeholder="000000"
+                                value={codigoAal}
+                                onChange={(e) => setCodigoAal(e.target.value.replace(/\D/g, ''))}
+                                className="tracking-[0.4em] text-center"
+                            />
+                            <BotonPrincipal type="submit" cargando={elevando} disabled={codigoAal.length !== 6}>
+                                Elevar a AAL2
+                            </BotonPrincipal>
+                        </form>
+                    ) : (
+                        <button
+                            onClick={registrarPasskey}
+                            disabled={ocupadoPasskey}
+                            className="w-full bg-white/60 hover:bg-white border border-white/70 hover:border-navy-300 text-navy-700 text-[12px] font-bold py-3 rounded-[18px] transition-all disabled:opacity-50"
+                        >
+                            {ocupadoPasskey ? 'Esperando al autenticador…' : 'Registrar biometría'}
+                        </button>
+                    )}
 
                     <p className="text-[10px] text-gray-400 font-medium text-center leading-relaxed mt-3">
                         La credencial queda amarrada al dominio donde se registra. Si el proyecto se
