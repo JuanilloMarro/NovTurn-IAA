@@ -14,10 +14,10 @@ export default function PasoBiometria() {
     const { verificarBiometria } = useFlujoAcceso();
 
     return (
-        <div className="space-y-5">
+        <div className="space-y-6">
             <AvisoError>{error}</AvisoError>
 
-            <div className="flex flex-col items-center py-4">
+            <div className="flex flex-col items-center py-6">
                 <div
                     className={`w-20 h-20 rounded-[28px] bg-white/50 border border-white/70 flex items-center justify-center shadow-sm transition-all duration-700
                         ${cargando ? 'scale-110 border-navy-300' : ''}`}

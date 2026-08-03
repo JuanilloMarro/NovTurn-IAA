@@ -34,7 +34,7 @@ export function BotonPrincipal({ children, cargando = false, ...props }) {
         <button
             {...props}
             disabled={cargando || props.disabled}
-            className="w-full !mt-8 bg-navy-700 hover:bg-navy-900 text-white text-[13px] font-bold py-4 rounded-[22px] shadow-btn hover:shadow-btn-hover hover:scale-[1.01] active:scale-[0.98] transition-all duration-700 disabled:opacity-50 disabled:hover:scale-100 flex items-center justify-center gap-3 group"
+            className="w-full !mt-10 bg-navy-700 hover:bg-navy-900 text-white text-[13px] font-bold py-4 rounded-[22px] shadow-btn hover:shadow-btn-hover hover:scale-[1.01] active:scale-[0.98] transition-all duration-700 disabled:opacity-50 disabled:hover:scale-100 flex items-center justify-center gap-3 group"
         >
             {cargando ? (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -51,7 +51,7 @@ export function BotonPrincipal({ children, cargando = false, ...props }) {
 export function AvisoError({ children }) {
     if (!children) return null;
     return (
-        <div className="mb-5 p-3.5 bg-white/40 border border-red-200/60 rounded-[20px] text-[12px] text-red-500 font-semibold flex items-start gap-3">
+        <div className="mb-6 p-4 bg-white/40 border border-red-200/60 rounded-[20px] text-[12px] text-red-500 font-semibold flex items-start gap-3">
             <AlertTriangle size={14} strokeWidth={2.5} className="shrink-0 mt-0.5" />
             <span>{children}</span>
         </div>

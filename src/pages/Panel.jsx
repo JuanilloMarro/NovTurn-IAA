@@ -22,12 +22,12 @@ export default function Panel() {
     const { cerrarSesion } = useFlujoAcceso();
 
     return (
-        <div className="min-h-[100dvh] safe-area-card py-6 sm:py-10 font-sans relative overflow-hidden">
+        <div className="min-h-[100dvh] safe-area-card py-10 sm:py-14 font-sans relative overflow-hidden">
             <div className="lg-orb hidden sm:block w-[500px] h-[500px] top-[-15%] right-[-10%] animate-float opacity-70" />
 
             <div className="relative z-10 max-w-3xl mx-auto animate-fade-up">
                 {/* Encabezado */}
-                <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center justify-between mb-10">
                     <div>
                         <h1 className="text-2xl font-light text-navy-900 tracking-tight">Acceso Seguro</h1>
                         <p className="text-[11px] text-gray-500 font-medium">{perfil?.email}</p>
@@ -42,7 +42,7 @@ export default function Panel() {
                 </div>
 
                 {/* Resultado de la autorización */}
-                <div className="glass-morphism rounded-[32px] p-8 md:p-10 mb-5 text-center relative overflow-hidden">
+                <div className="glass-morphism rounded-[32px] p-8 md:p-10 mb-6 text-center relative overflow-hidden">
                     <div className="w-16 h-16 rounded-[24px] bg-emerald-50 border border-emerald-200/70 flex items-center justify-center mx-auto mb-5">
                         <ShieldCheck size={30} strokeWidth={2} className="text-emerald-600" />
                     </div>
@@ -61,15 +61,15 @@ export default function Panel() {
                 </div>
 
                 {/* Los tres factores */}
-                <div className="glass-morphism rounded-[32px] p-7 md:p-8 mb-5">
+                <div className="glass-morphism rounded-[32px] p-7 md:p-8 mb-6">
                     <h3 className="text-[11px] font-bold text-navy-900/40 tracking-[0.15em] uppercase mb-5">
                         Factores superados
                     </h3>
-                    <div className="space-y-3">
+                    <div className="space-y-3.5">
                         {FACTORES.map(({ clave, etiqueta, detalle, Icono }) => (
                             <div
                                 key={clave}
-                                className="flex items-center gap-4 bg-white/50 border border-white/70 rounded-[20px] px-4 py-3.5"
+                                className="flex items-center gap-4 bg-white/50 border border-white/70 rounded-[20px] px-4 py-4"
                             >
                                 <div className="w-9 h-9 rounded-[14px] bg-emerald-50 border border-emerald-200/60 flex items-center justify-center shrink-0">
                                     <Icono size={16} strokeWidth={2.2} className="text-emerald-600" />

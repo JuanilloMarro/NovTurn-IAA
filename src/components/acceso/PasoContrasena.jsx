@@ -23,8 +23,8 @@ export default function PasoContrasena() {
     }
 
     return (
-        <form onSubmit={enviar} className="space-y-5">
-            <div className="mb-5 p-3.5 bg-white/50 border border-white/70 rounded-[20px] text-center">
+        <form onSubmit={enviar} className="space-y-6">
+            <div className="mb-6 p-4 bg-white/50 border border-white/70 rounded-[20px] text-center">
                 <div className="text-[10px] font-bold text-navy-900/40 tracking-wide uppercase">
                     Identificado como
                 </div>

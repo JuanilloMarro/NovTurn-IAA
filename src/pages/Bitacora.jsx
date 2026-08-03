@@ -42,11 +42,11 @@ export default function Bitacora() {
     useEffect(() => { cargar(); }, []);
 
     return (
-        <div className="min-h-[100dvh] safe-area-card py-6 sm:py-10 font-sans relative overflow-hidden">
+        <div className="min-h-[100dvh] safe-area-card py-10 sm:py-14 font-sans relative overflow-hidden">
             <div className="lg-orb hidden sm:block w-[450px] h-[450px] bottom-[-10%] left-[-10%] animate-float-delayed opacity-70" />
 
             <div className="relative z-10 max-w-5xl mx-auto animate-fade-up">
-                <div className="flex items-center justify-between mb-8 gap-4">
+                <div className="flex items-center justify-between mb-10 gap-4">
                     <div className="min-w-0">
                         <Link
                             to="/panel"

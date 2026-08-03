@@ -21,7 +21,7 @@ export default function IndicadorProgreso() {
     const indiceActual = ORDEN.indexOf(paso);
 
     return (
-        <div className="flex items-stretch gap-1.5 mb-7">
+        <div className="flex items-stretch gap-1.5 mb-8">
             {PASTILLAS.map(({ paso: p, etiqueta, factor, Icono }, i) => {
                 const cumplido = factor ? !!factores[factor] : indiceActual > i || paso === 'autorizacion';
                 const activo = p === paso;
@@ -30,7 +30,7 @@ export default function IndicadorProgreso() {
                     <div
                         key={p}
                         className={`
-                            flex-1 rounded-[16px] border px-2 py-2.5 text-center transition-all duration-500
+                            flex-1 rounded-[16px] border px-2 py-3 text-center transition-all duration-500
                             ${cumplido
                                 ? 'bg-emerald-50/80 border-emerald-200/70'
                                 : activo
@@ -38,7 +38,7 @@ export default function IndicadorProgreso() {
                                     : 'bg-white/25 border-white/40'}
                         `}
                     >
-                        <div className="flex items-center justify-center mb-1">
+                        <div className="flex items-center justify-center mb-1.5">
                             {cumplido
                                 ? <Check size={14} strokeWidth={3} className="text-emerald-600" />
                                 : <Icono size={14} strokeWidth={2.5} className={activo ? 'text-navy-900' : 'text-gray-400'} />}

@@ -217,7 +217,7 @@ export default function Enrolamiento() {
             titulo="Registro de factores"
             descripcion={emailDelFlujo || sesion.user.email}
         >
-            <div className="space-y-7">
+            <div className="space-y-10">
                 {/* ── Inherencia ───────────────────────────────────────────── */}
                 <section>
                     <div className="flex items-center gap-2 mb-3">

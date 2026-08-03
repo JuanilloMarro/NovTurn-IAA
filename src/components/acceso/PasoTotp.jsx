@@ -20,7 +20,7 @@ export default function PasoTotp() {
     }
 
     return (
-        <form onSubmit={enviar} className="space-y-5">
+        <form onSubmit={enviar} className="space-y-6">
             <AvisoError>{error}</AvisoError>
 
             <CampoTexto
