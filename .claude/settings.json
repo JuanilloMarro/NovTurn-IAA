@@ -1,0 +1,25 @@
+{
+    "permissions": {
+        "additionalDirectories": [
+            "../NovTurnIA/NovTurnIA/src",
+            "../NovTurnIA/NovTurnIA/tailwind.config.js",
+            "../NovTurnIA/NovTurnIA/postcss.config.js",
+            "../NovTurnIA/NovTurnIA/eslint.config.js",
+            "../NovTurnIA/NovTurnIA/vercel.json"
+        ],
+        "deny": [
+            "Edit(../NovTurnIA/**)",
+            "Write(../NovTurnIA/**)",
+            "Edit(C:/Users/jmarr/Documents/Antigravity Projects/NovTurnIA/**)",
+            "Write(C:/Users/jmarr/Documents/Antigravity Projects/NovTurnIA/**)"
+        ],
+        "allow": [
+            "Bash(npm run dev)",
+            "Bash(npm run build)",
+            "Bash(npm install:*)",
+            "Bash(git status)",
+            "Bash(git diff:*)",
+            "Bash(git log:*)"
+        ]
+    }
+}

@@ -1,0 +1,711 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #F4F5F9;
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Orbes decorativos de fondo - NO modificar */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    /* Top Right Accent - New */
+    radial-gradient(circle at 85% 10%, rgba(64, 98, 200, 0.10) 0%, transparent 70%),
+    /* Top Left Accent */
+    radial-gradient(circle at 15% 15%, rgba(29, 95, 173, 0.10) 0%, transparent 75%),
+    /* Bottom Right Accent */
+    radial-gradient(circle at 85% 85%, rgba(120, 110, 230, 0.10) 0%, transparent 75%),
+    /* Bottom Left Accent */
+    radial-gradient(circle at 15% 85%, rgba(64, 98, 200, 0.10) 0%, transparent 70%),
+    /* Bottom Center Accent */
+    radial-gradient(circle at 50% 110%, rgba(255, 255, 255, 0.8) 0%, transparent 50%),
+    /* Base Neutral Surface */
+    radial-gradient(circle at 50% 50%, #F5F8FF 0%, #EBF0F8 100%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Animaciones */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes drawerIn {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.animate-fade-up {
+  animation: fadeUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-drawer-in {
+  animation: drawerIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, rgba(220, 228, 240, 0.5) 25%, rgba(235, 240, 250, 0.8) 50%, rgba(220, 228, 240, 0.5) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite ease-in-out;
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float-delayed {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+.animate-float-delayed {
+  animation: float-delayed 8s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+.glass-morphism {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+@keyframes liquid {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@layer utilities {
+  .shadow-card {
+    box-shadow: 0 8px 30px rgba(26, 58, 107, 0.06);
+  }
+}
+
+.glass-premium {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(32px) saturate(200%);
+  -webkit-backdrop-filter: blur(32px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 4px 24px rgba(26, 58, 107, 0.04),
+    0 8px 48px rgba(26, 58, 107, 0.08);
+}
+
+.glass-input {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(15, 32, 68, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #0F2044;
+}
+
+.glass-input:focus {
+  background: #ffffff;
+  border-color: #1D5FAD;
+  box-shadow: 0 0 0 4px rgba(29, 95, 173, 0.1);
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+/* ── Burbujas (Orbes) Decorativas - Aspecto "volador" ── */
+.lg-orb {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%,
+      rgba(255, 255, 255, 0.5) 0%,
+      rgba(210, 230, 255, 0.2) 40%,
+      rgba(29, 95, 173, 0.1) 70%,
+      transparent 100%);
+  backdrop-filter: blur(80px) saturate(180%);
+  -webkit-backdrop-filter: blur(80px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    inset -10px -10px 40px rgba(100, 160, 230, 0.1),
+    inset 10px 10px 40px rgba(255, 255, 255, 0.6),
+    0 40px 100px rgba(29, 95, 173, 0.08);
+  pointer-events: none;
+  transition: all 1.5s ease-in-out;
+}
+
+/* Toast progress bar animation */
+@keyframes toast-progress {
+  from {
+    width: 100%;
+  }
+
+  to {
+    width: 0%;
+  }
+}
+
+/* ── Borde aurora de los componentes de IA (conic-gradient + máscara) ──
+   No es una línea LED: es un SOMBREADO de luz de neón que envuelve el borde.
+   Dos capas difuminadas sobre el mismo riel:
+     · ::before → sombra de color cercana: abraza el borde físico, difusa.
+     · ::after  → halo ambiental amplio: feathering hacia el interior y baño
+       de luz hacia afuera.
+   Ambas respiran con amplitud alta y en fases distintas (respiración LED)
+   mientras el color fluye por el perímetro: verde neón/cyan → azul cobalto →
+   violeta eléctrico → magenta/fucsia con destellos ámbar.
+   Ciclo de vida (lo maneja useAuroraPulse):
+     .is-on   → encendida a plena intensidad (encendido ágil)
+     .is-live → las animaciones corren; se mantiene durante el apagado para
+                que la luz siga fluyendo mientras muere de a pocos
+     sin clases → reposo total, cero animaciones corriendo. */
+@property --ai-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* Intensidad global (transicionable): 0 apagada ↔ 1 encendida. */
+@property --aurora-glow {
+  syntax: '<number>';
+  initial-value: 0;
+  inherits: true;
+}
+
+@keyframes ai-aurora-spin {
+  to {
+    --ai-angle: 360deg;
+  }
+}
+
+/* Respiración LED exagerada: sube casi a pleno brillo y baja a un rescoldo,
+   sin apagarse nunca del todo mientras vive. */
+@keyframes ai-aurora-breathe {
+  0%, 100% {
+    opacity: calc(0.25 * var(--aurora-glow));
+  }
+
+  50% {
+    opacity: calc(0.95 * var(--aurora-glow));
+  }
+}
+
+.ai-aurora {
+  position: relative;
+  --aurora-glow: 0;
+  /* Apagado lento: la luz muere de a pocos, nunca se corta de golpe.
+     (2.6s = FADE_MS de useAuroraPulse — mantener en sincronía) */
+  transition: --aurora-glow 2.6s ease-out;
+}
+
+.ai-aurora.is-on {
+  --aurora-glow: 1;
+  /* Encendido más ágil que el apagado */
+  transition: --aurora-glow 0.9s ease-in;
+}
+
+.ai-aurora::before,
+.ai-aurora::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  /* Opacidad base sin animación (reposo y prefers-reduced-motion): sigue a
+     la intensidad global — la respiración la reemplaza mientras vive. */
+  opacity: calc(0.55 * var(--aurora-glow));
+  /* Viaje cromático cíclico: abre y cierra en el mismo color → loop sin
+     costura. La variación de alpha a lo largo del recorrido simula el
+     grosor irregular del líquido neón (pulsos en las esquinas). */
+  background: conic-gradient(from var(--ai-angle),
+      rgba(52, 240, 165, 0.85) 0deg,     /* verde neón */
+      rgba(34, 211, 238, 0.95) 48deg,    /* cyan brillante */
+      rgba(37, 99, 235, 0.75) 110deg,    /* azul cobalto profundo */
+      rgba(124, 58, 237, 0.90) 162deg,   /* violeta eléctrico */
+      rgba(217, 70, 239, 0.80) 205deg,   /* fucsia */
+      rgba(236, 72, 153, 0.95) 238deg,   /* magenta intenso */
+      rgba(251, 146, 60, 0.70) 258deg,   /* destello ámbar (giro de esquina) */
+      rgba(236, 72, 153, 0.85) 280deg,   /* magenta de regreso */
+      rgba(139, 92, 246, 0.75) 318deg,   /* violeta de transición */
+      rgba(52, 240, 165, 0.85) 360deg);  /* cierra en verde → loop perfecto */
+  -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+}
+
+/* Las animaciones solo corren mientras el efecto vive (encendido o
+   apagándose) → cero trabajo por frame en reposo. */
+.ai-aurora.is-live::before,
+.ai-aurora.is-live::after {
+  animation:
+      ai-aurora-spin 9s linear infinite,
+      ai-aurora-breathe 3.4s ease-in-out infinite;
+}
+
+/* Sombra de color cercana — abraza el borde físico, sin línea nítida */
+.ai-aurora::before {
+  padding: 3px;
+  z-index: 2;
+  filter: blur(7px);
+}
+
+/* Halo ambiental — se desvanece a pocos píxeles hacia adentro y proyecta
+   la luz hacia afuera */
+.ai-aurora::after {
+  padding: 8px;
+  z-index: 1;
+  filter: blur(26px);
+}
+
+/* El halo respira desfasado de la sombra cercana (≈⅓ de ciclo) → las capas
+   ondulan a destiempo y el conjunto se siente orgánico, no mecánico. */
+.ai-aurora.is-live::after {
+  animation-delay: 0s, -1.1s;
+}
+
+/* Variante compacta — para controles pequeños (botón de IA del sidebar):
+   sombras más cortas para no invadir los items vecinos. */
+.ai-aurora--sm::before {
+  padding: 2px;
+  filter: blur(4px);
+}
+
+.ai-aurora--sm::after {
+  padding: 4px;
+  filter: blur(14px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .ai-aurora.is-live::before,
+  .ai-aurora.is-live::after {
+    animation: none;
+  }
+}
+
+/* ── Minimalist Custom Scrollbar ── */
+/* Firefox */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(15, 32, 68, 0.15) transparent;
+}
+
+/* Chrome, Edge, Safari */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+  /* For horizontal scrollbars */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(15, 32, 68, 0.15);
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(15, 32, 68, 0.25);
+}
+
+/* Completely hidden scrollbar option (Utility) */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── T2/T3 (Responsive — Fase 1 shell) ──────────────────────────────────
+   El marco de vidrio del shell (App.jsx, AdminPanel.jsx) usaba `p-2 sm:p-4
+   lg:p-6` fijo: en móvil esos 8px son puramente decorativos (R18) y, con
+   `viewport-fit=cover` activo en el meta viewport, no había ningún
+   `env(safe-area-inset-*)` que compensara la muesca o la barra de gestos
+   (R8). Una sola clase resuelve ambos: en móvil el padding ES el safe area
+   (0 en dispositivos sin muesca); desde `sm`/`lg` se usa `max()` contra el
+   gutter de diseño, así que en un navegador sin safe-area-inset (todo
+   desktop, y el propio Chromium headless de los tests) el resultado es
+   IDÉNTICO en px a `sm:p-4 lg:p-6` — 1280px no cambia.
+   No usar `p-[...]` de Tailwind por lado: son 4 lados × 3 breakpoints y
+   Tailwind no permite un valor de fallback distinto por breakpoint sin
+   volverse ilegible en el JSX. */
+.safe-area-shell {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+}
+
+@media (min-width: 640px) {
+  .safe-area-shell {
+    padding-top: max(env(safe-area-inset-top, 0px), 1rem);
+    padding-right: max(env(safe-area-inset-right, 0px), 1rem);
+    padding-bottom: max(env(safe-area-inset-bottom, 0px), 1rem);
+    padding-left: max(env(safe-area-inset-left, 0px), 1rem);
+  }
+}
+
+@media (min-width: 1024px) {
+  .safe-area-shell {
+    padding-top: max(env(safe-area-inset-top, 0px), 1.5rem);
+    padding-right: max(env(safe-area-inset-right, 0px), 1.5rem);
+    padding-bottom: max(env(safe-area-inset-bottom, 0px), 1.5rem);
+    padding-left: max(env(safe-area-inset-left, 0px), 1.5rem);
+  }
+}
+
+/* Variante para pantallas de tarjeta centrada (Login, ErrorBoundary): no
+   disuelven marco (T2 no aplica — la tarjeta es contenido, no el "marco"
+   decorativo de R18), pero sí necesitan el safe area de R8/T3. Mantienen su
+   padding de diseño (1rem) vía `max()`, igual que arriba, así que en un
+   navegador sin inset el resultado es igual al `p-4` que reemplazan. */
+.safe-area-card {
+  padding-top: max(env(safe-area-inset-top, 0px), 1rem);
+  padding-right: max(env(safe-area-inset-right, 0px), 1rem);
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 1rem);
+  padding-left: max(env(safe-area-inset-left, 0px), 1rem);
+}
+
+/* Misma idea, gutter de 1.5rem (reemplaza `p-6`) — usada por ErrorBoundary. */
+.safe-area-card-lg {
+  padding-top: max(env(safe-area-inset-top, 0px), 1.5rem);
+  padding-right: max(env(safe-area-inset-right, 0px), 1.5rem);
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 1.5rem);
+  padding-left: max(env(safe-area-inset-left, 0px), 1.5rem);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   T28 · HORIZONTAL EN TÁCTIL (teléfono y tablet acostados)
+   ───────────────────────────────────────────────────────────────────────────
+   POR QUÉ ESTE BLOQUE EXISTE. Todo el trabajo responsive anterior se acotó por
+   ANCHO (`max-sm:`, `max-lg:`), y en horizontal el ancho sobra: lo que escasea
+   es el ALTO. Un teléfono acostado son 812x375 y una tablet 1024x768. Medido:
+   `safe-area-shell` mete 1rem de gutter mínimo desde 640px y 1.5rem desde
+   1024px, así que en horizontal se comían 32-48px de alto — entre el 8% y el
+   13% de la pantalla — solo en márgenes decorativos. Encima el marco suma
+   borde, sombra y esquinas redondeadas que en horizontal no aportan nada.
+
+   POR QUÉ `hover: none` Y NO SOLO `orientation`. Un portátil de 1280x800 también
+   es "landscape", y tocarlo sería romper escritorio. `hover: none` es la señal
+   fiable de dispositivo táctil: deja fuera cualquier laptop o monitor.
+
+   POR QUÉ `!important`. Estas reglas tienen que ganarle a utilidades de Tailwind
+   (`sm:rounded-[24px]`, `sm:border`) que ya están aplicadas en el elemento. Es
+   el único lugar del sistema donde se usa, y es deliberado.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (orientation: landscape) and (hover: none) {
+  /* Se recupera el borde: solo queda el inset real del notch, sin gutter
+     decorativo. En un dispositivo sin notch el padding pasa a 0. */
+  .safe-area-shell {
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-left: env(safe-area-inset-left, 0px);
+  }
+
+  /* El marco de vidrio se disuelve, igual que ya hacía en teléfono vertical
+     (T2). El fondo y el blur se conservan: lo que se va es el contorno. */
+  .app-frame {
+    border-radius: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* Las tiras de acciones se comportan como en vertical SIN depender del ancho.
+     Las variantes `max-lg:` del JSX cortan en 1024px, así que una tablet
+     acostada (1024 justo) se quedaba con la fila apilada y los botones
+     desbordando. Acá se fuerza el mismo comportamiento por orientación.
+
+     ⚠️ `!important` NO es decorativo acá, es obligatorio. Las utilidades
+     `lg:overflow-visible`, `lg:w-auto` y `lg:justify-end` de Tailwind se
+     compilan DESPUÉS de este bloque (medido: posición 90562 contra 68953) y
+     tienen la MISMA especificidad (0,1,0), así que ganaban por orden de fuente
+     y este override quedaba en nada — justo en tablet acostada, que es el caso
+     que venía a arreglar. Sin `!important` esta regla no hace absolutamente
+     nada a 1024px. */
+  .mobile-strip {
+    width: 100% !important;
+    flex-wrap: nowrap !important;
+    justify-content: flex-end !important;
+    justify-content: safe flex-end !important;
+    overflow-x: auto !important;
+  }
+
+  .mobile-strip > * {
+    flex-shrink: 0 !important;
+  }
+
+  /* Variante centrada — para los pies de acción de los cajones (Perfil de
+     cliente, Detalle de turno), que van centrados por diseño. El
+     `flex-start` de arriba es correcto para las filas de cabecera de módulo,
+     pero acá los empujaba a la izquierda.
+
+     `safe center` y no `center` a secas: cuando el contenido DESBORDA, un
+     `center` normal deja los primeros botones fuera del área desplazable y no
+     hay forma de llegar a ellos. `safe` centra mientras entra y cae a
+     `flex-start` en cuanto no entra, que es justo el comportamiento que se
+     quiere. Se declara `center` antes como respaldo para navegadores que no
+     entiendan la palabra clave `safe` (la ignoran y se quedan con el primero). */
+  .mobile-strip--center {
+    justify-content: center !important;
+    justify-content: safe center !important;
+  }
+}
+
+/* Teléfono acostado — el caso extremo: ~375px de alto.
+   La barra superior de 72px se lleva casi el 20% de la pantalla. */
+@media (orientation: landscape) and (hover: none) and (max-height: 500px) {
+  .app-topbar {
+    height: 52px !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   T11/T12/T14 · CONTRATO DE CAPAS
+   ───────────────────────────────────────────────────────────────────────────
+   La auditoría pedía "tokens de z-index porque hay 361 `z-10` y 11 valores
+   sueltos". Al inventariarlo resultó que **la escalera ya era coherente**: los
+   356 `z-10` no son 356 capas compitiendo, son UN solo modismo repetido —
+   "contenido por encima de los glows decorativos de su propia tarjeta", donde
+   los glows van en `z-0`. Reescribirlos a un token sería puro churn con riesgo
+   de regresión y cero beneficio visible. Lo que faltaba era **escribir la
+   escalera**, no cambiarla. Esta es, medida sobre el código:
+
+     z-0    glows decorativos dentro de una tarjeta
+     z-10   contenido de la tarjeta, por encima de sus glows   (356 usos)
+     z-20   el <aside> del sidebar
+     z-[19] el velo del sidebar (justo debajo del aside, a propósito)
+     z-50   desplegables anclados dentro de un panel
+     z-[100] desplegable dentro de un modal · barra superior
+     z-[110] velo de cajón · lanzador del asistente
+     z-[120] cajones (turno, cliente, finanzas, insight)
+     z-[200] modales
+     z-[300] flotantes portados: Popover, paleta de comandos, popovers de
+             Seguimiento — tienen que ganarle a un modal abierto
+     z-[400] tooltips — por encima de todo lo anterior, nunca reciben clic
+     z-[500] toasts
+
+   REGLA DEL PORTAL (T12/T13). Un flotante que tenga que salirse de su tarjeta
+   va por `createPortal` a `document.body`. No alcanza con subirle el z-index:
+
+     · 369 `overflow-hidden` en el sistema RECORTAN, y el z-index no salva de
+       un recorte. Además `overflow-x: auto` obliga a `overflow-y: auto` — no
+       se puede recortar un solo eje. Así se rompieron los menús de Filtros al
+       volver la fila de acciones una tira deslizable.
+     · 332 `backdrop-blur` CREAN CONTEXTO DE APILAMIENTO, así que un
+       `z-[200]` dentro de una tarjeta jamás le gana a la tarjeta de al lado.
+
+   T14 · Y `position: fixed` tampoco alcanza: un ancestro con `backdrop-filter`
+   se vuelve su bloque contenedor. Medido — un `fixed inset-0` dentro de un
+   marco con `backdrop-blur` mide 300x200 en vez de 768x1024. El shell de la
+   app (`App.jsx`) tiene `backdrop-blur-xl`, así que TODO `fixed` de adentro
+   está anclado al marco, no a la pantalla.
+
+   ⚠️ Ese anclaje NO es un bug acá y no hay que "arreglarlo": el marco lleva
+   `safe-area-shell`, así que los cajones a pantalla completa heredan gratis el
+   respeto por el notch. Portarlos al body los sacaría de esa protección. Se
+   portan los FLOTANTES (menús, tooltips), no los cajones.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   AJUSTES DE PANTALLA CHICA
+   ───────────────────────────────────────────────────────────────────────────
+   REGLA DE ORO DE ESTE BLOQUE: el lenguaje visual de escritorio NO se toca.
+   Todo lo que viva acá adentro está encerrado en una media query, así que por
+   encima de su límite estas reglas **no existen**: el navegador ni siquiera
+   las evalúa. Cero propiedades sobrescritas, cero riesgo de filtración.
+
+   Por qué 1023.98px y no otro número: es exactamente el punto donde Tailwind
+   activa `lg:`. Debajo de ese ancho el sidebar es un cajón deslizable; desde
+   ahí queda fijo dentro del marco de vidrio (`lg:translate-x-0`). Cortar en el
+   mismo lugar garantiza que estas reglas solo alcancen al caso del cajón.
+
+   ⚠️ ESTE LÍMITE ESTÁ ACOPLADO AL JSX. Si algún día el sidebar vuelve a `md:`,
+   hay que mover este número con él — si no, el cajón se desliza sin fondo (el
+   bug original de T6) o el fondo aparece cuando el sidebar ya está fijo. Los
+   anclajes que deben coincidir son cinco:
+     · `App.jsx`      → `lg:ml-[272px]`
+     · `Topbar.jsx`   → `lg:hidden` en el botón de hamburguesa
+     · `Sidebar.jsx`  → `lg:hidden` en el velo, `lg:translate-x-0` en el aside
+                        y el `window.innerWidth < 1024` de `closeMobile`
+
+   Si hace falta agregar más ajustes de pantalla chica, van ACÁ DENTRO, no como
+   clases sueltas en el JSX — así queda un solo lugar que auditar.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 1023.98px) {
+  /* T6 — El cajón necesita superficie propia.
+     Mientras es cajón el `<aside>` se desliza sobre el contenido, pero es
+     `bg-transparent`: el menú se leía encima de la pantalla de atrás, con los
+     dos textos superpuestos. En escritorio el aside vive DENTRO del marco de
+     vidrio y ahí la transparencia es correcta y deliberada — por eso el fondo
+     se agrega solo acá y no se toca la clase original. */
+  .sidebar-drawer {
+    background-color: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border-right: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 20px 50px rgba(26, 58, 107, 0.18);
+  }
+}
+
+/* T22/T23 — Tira de acciones deslizable.
+   ───────────────────────────────────────────────────────────────────────────
+   ⚠️ ESTA REGLA VA FUERA DE TODA MEDIA QUERY, A PROPÓSITO. Estuvo encerrada en
+   `max-width: 639.98px` y ahí estaba el bug: las filas de acciones llevan
+   `overflow-x-auto lg:overflow-visible`, o sea que el recorte está activo hasta
+   **1023px**, no hasta 639. En tablet la sombra de los botones volvía a salir
+   cortada porque el aire de abajo dejaba de aplicarse en 640.
+   La regla tiene que cubrir el mismo rango que el recorte que compensa.
+
+   Es seguro globalmente: el padding se anula con el margen negativo, así que el
+   alto ocupado en el flujo no cambia (medido: bloque de 80px antes y después), y
+   esconder una barra de scroll que solo existe cuando hay desbordamiento no
+   tiene efecto donde no lo hay.
+
+   Sobre el nombre de la clase: no se puede usar `max-sm:no-scrollbar`.
+   `no-scrollbar` es una clase propia definida fuera de `@layer utilities`, y
+   Tailwind no genera variantes para clases que no conoce — esa utilidad se
+   compila a nada, en silencio. */
+.mobile-strip {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  /* Aire para la sombra de los botones. `overflow-x: auto` recorta al ras de la
+     caja y los botones llevan `shadow-md`: sin esto la sombra de abajo salía
+     cortada y la tira se veía "pegada" al borde. Los `-m` compensan para que la
+     fila no crezca ni empuje al contenido de abajo. */
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-top: -6px;
+  margin-bottom: -6px;
+
+  /* Alineación a la DERECHA, como en escritorio.
+     La tira es `w-full` en pantallas chicas, así que sin esto los botones se
+     iban contra el título, a la izquierda. Acá vive el criterio para todos los
+     módulos (Citas, Estadísticas, Re-agendación, Actividad, Finanzas): una sola
+     fuente de verdad en vez de una clase `justify-*` distinta por página.
+
+     ⚠️ `safe flex-end` y no `flex-end` a secas. Cuando el contenido DESBORDA, un
+     `flex-end` normal empuja los primeros botones fuera del área desplazable y
+     no hay forma de llegar a ellos — se pierden. `safe` alinea a la derecha
+     mientras entra y cae a la izquierda en cuanto no entra, que es exactamente
+     lo que se quiere de una tira deslizable.
+     Se declara `flex-end` antes como respaldo: un navegador que no entienda la
+     palabra clave `safe` ignora la segunda línea y se queda con la primera. */
+  justify-content: flex-end;
+  justify-content: safe flex-end;
+}
+
+.mobile-strip::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 639.98px) {
+  /* T24 — Objetivos táctiles.
+     Los 16 botones circulares de 28px (`w-7 h-7`) y 24px (`w-6 h-6`) están por
+     debajo del mínimo cómodo de 44px: cerrar un modal, las flechas de período
+     de Finanzas, quitar un teléfono de un cliente.
+
+     Se agranda el ÁREA, no el botón. Un `::after` invisible extiende la zona
+     sensible; el círculo se sigue viendo exactamente igual, así que el diseño
+     no se mueve ni un pixel — que es la restricción de esta fase.
+
+     Solo se estira en VERTICAL, a propósito. Estirar también a lo ancho haría
+     que dos botones vecinos se solaparan y el de más abajo en el DOM se comería
+     los toques del otro. El alto es el eje que falta: estos botones viven en
+     filas horizontales, donde el dedo falla por arriba o por abajo.
+
+     ⚠️ ALCANCE REAL, MEDIDO con `elementFromPoint`: llega a 11 de los 16.
+     Los otros 5 llevan `overflow-hidden` en el propio botón, que recorta el
+     pseudo-elemento — medido: área sensible 26px con `overflow-hidden` contra
+     42px sin él, con el mismo tamaño visual de 28x28 en ambos. Para esos 5 no
+     hay atajo por CSS: hay que envolverlos o quitarles el recorte, uno por uno
+     y mirando que no se rompa el círculo. Queda anotado en T24. */
+  button.w-7.h-7,
+  button.w-6.h-6 {
+    position: relative;
+  }
+
+  button.w-7.h-7::after,
+  button.w-6.h-6::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 44px;
+    transform: translateY(-50%);
+  }
+}
