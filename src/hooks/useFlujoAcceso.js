@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, MODO_DEMO } from '../config/supabase';
+import { mensajeDeError, obtenerCredencialBiometrica } from '../config/webauthn';
 import { useAuthStore } from '../store/useAuthStore';
 import { showDenegadoToast, showFactorToast } from '../store/useToastStore';
 
@@ -102,20 +103,27 @@ export function useFlujoAcceso() {
     const verificarBiometria = useCallback(async () => {
         setCargando(true);
 
-        // `signInWithPasskey()` ejecuta la ceremonia WebAuthn completa: pide el
-        // reto al servidor, invoca `navigator.credentials.get()` —que abre
-        // Windows Hello, Touch ID o la huella del teléfono— y verifica la
-        // credencial. Verificado en el .d.ts de @supabase/auth-js 2.111.0.
-        // El PLAN contemplaba la API de dos pasos; en esta versión sus
-        // ayudantes de serialización (`serializeCredentialRequestResponse` y
-        // compañía) no se reexportan desde @supabase/supabase-js, así que la
-        // forma de dos pasos obligaría a importar rutas internas del paquete.
-        // El control de identidad de abajo funciona igual con las dos.
-        const { data, error } = await supabase.auth.signInWithPasskey();
+        // Ceremonia en dos pasos, tal como indica PLAN.md §5.4. No se usa
+        // `signInWithPasskey()` porque impone `hints: ['security-key']`, y en
+        // iOS eso hace que Safari ofrezca sólo QR o llave de seguridad en vez
+        // de Face ID — es decir, "algo que tengo" disfrazado de "algo que soy".
+        // El detalle está en el encabezado de `config/webauthn.js`.
+        let data;
+        try {
+            const { data: reto, error: errReto } = await supabase.auth.passkey.startAuthentication();
+            if (errReto) throw errReto;
 
-        if (error) {
-            await registrar(email, 'biometria', 'fallo', error.message);
-            setError('No se pudo verificar la biometría. Volvé a intentarlo.');
+            const credencial = await obtenerCredencialBiometrica(reto.options);
+
+            const { data: verificado, error: errVerify } = await supabase.auth.passkey.verifyAuthentication({
+                challengeId: reto.challenge_id,
+                credential: credencial,
+            });
+            if (errVerify) throw errVerify;
+            data = verificado;
+        } catch (err) {
+            await registrar(email, 'biometria', 'fallo', err?.message ?? 'Ceremonia biométrica fallida');
+            setError(mensajeDeError(err));
             return;
         }
 

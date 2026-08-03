@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Check, Fingerprint, Lock, Mail, Smartphone, Trash2 } from 'lucide-react';
 import { supabase } from '../config/supabase';
+import { crearCredencialBiometrica, mensajeDeError, soportaWebAuthn } from '../config/webauthn';
 import TarjetaAcceso from '../components/acceso/TarjetaAcceso';
 import { AvisoError, BotonPrincipal, CampoTexto } from '../components/acceso/piezas';
 import Badge from '../components/ui/Badge';
@@ -124,12 +125,36 @@ export default function Enrolamiento() {
     async function registrarPasskey() {
         setOcupadoPasskey(true);
         setErrorPasskey('');
-        // Ejecuta la ceremonia WebAuthn completa y abre Windows Hello / Touch ID.
-        const { data, error } = await supabase.auth.registerPasskey();
-        setOcupadoPasskey(false);
-        if (error) { setErrorPasskey(error.message); return; }
-        showSuccessToast('Biometría registrada', data?.friendly_name ?? 'Credencial creada');
-        refrescar();
+
+        if (!soportaWebAuthn()) {
+            setOcupadoPasskey(false);
+            setErrorPasskey('Este navegador no soporta WebAuthn.');
+            return;
+        }
+
+        try {
+            // Ceremonia en dos pasos, no `registerPasskey()`: es la única forma
+            // de imponer `authenticatorAttachment: 'platform'` y conseguir que
+            // iOS ofrezca Face ID en vez de QR o llave de seguridad.
+            // Ver el encabezado de `config/webauthn.js`.
+            const { data: reto, error: errReto } = await supabase.auth.passkey.startRegistration();
+            if (errReto) throw errReto;
+
+            const credencial = await crearCredencialBiometrica(reto.options);
+
+            const { data, error } = await supabase.auth.passkey.verifyRegistration({
+                challengeId: reto.challenge_id,
+                credential: credencial,
+            });
+            if (error) throw error;
+
+            showSuccessToast('Biometría registrada', data?.friendly_name ?? 'Credencial creada');
+            refrescar();
+        } catch (err) {
+            setErrorPasskey(mensajeDeError(err));
+        } finally {
+            setOcupadoPasskey(false);
+        }
     }
 
     async function borrarPasskey(passkeyId) {
