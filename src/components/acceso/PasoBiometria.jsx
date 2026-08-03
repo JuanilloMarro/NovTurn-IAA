@@ -10,7 +10,7 @@ import { AvisoError, BotonPrincipal } from './piezas';
  * en AAL1, así que si el TOTP fuera antes, esta sesión lo anularía.
  */
 export default function PasoBiometria() {
-    const { error, cargando, nombre, email } = useAuthStore();
+    const { error, cargando } = useAuthStore();
     const { verificarBiometria } = useFlujoAcceso();
 
     return (
@@ -29,19 +29,13 @@ export default function PasoBiometria() {
                     />
                 </div>
                 <p className="text-[12px] text-gray-500 font-medium text-center mt-5 leading-relaxed max-w-[280px]">
-                    Confirmá tu identidad con la huella, el rostro o el PIN del
-                    dispositivo. Se abrirá el autenticador del sistema.
+                    Confirmá tu identidad con el rostro, la huella o el PIN del dispositivo.
                 </p>
             </div>
 
             <BotonPrincipal type="button" cargando={cargando} onClick={verificarBiometria}>
                 Verificar biometría
             </BotonPrincipal>
-
-            <p className="text-[10px] text-gray-400 font-medium text-center leading-relaxed pt-1">
-                La credencial debe pertenecer a <span className="font-bold">{nombre || email}</span>.
-                Si pertenece a otra cuenta, el acceso se deniega y el intento queda en la bitácora.
-            </p>
         </div>
     );
 }

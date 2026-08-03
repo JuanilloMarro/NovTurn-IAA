@@ -96,8 +96,25 @@ export function useFlujoAcceso() {
 
         await registrar(email, 'password', 'exito', 'Factor conocimiento superado');
         showFactorToast('Conocimiento verificado', 'Contraseña correcta');
+
+        // El registro de factores vive detrás de este punto: sólo se llega
+        // habiendo dicho quién se es y habiéndolo probado con la contraseña.
+        // Si a la cuenta le falta algún factor, se completa antes de seguir.
+        const [{ data: passkeys }, { data: mfa }] = await Promise.all([
+            supabase.auth.passkey.list(),
+            supabase.auth.mfa.listFactors(),
+        ]);
+        const faltaBiometria = !(Array.isArray(passkeys) && passkeys.length);
+        const faltaAutenticador = !(mfa?.totp ?? []).some((f) => f.status === 'verified');
+
+        if (faltaBiometria || faltaAutenticador) {
+            factorSuperado('conocimiento', 'biometria');
+            navigate('/enrolamiento');
+            return;
+        }
+
         factorSuperado('conocimiento', 'biometria');
-    }, [email, factorSuperado, setAal, setCargando, setError, setIdEsperado]);
+    }, [email, factorSuperado, navigate, setAal, setCargando, setError, setIdEsperado]);
 
     // ── Paso 3 · Biometría (algo que SOY) ─────────────────────────────────────
     const verificarBiometria = useCallback(async () => {

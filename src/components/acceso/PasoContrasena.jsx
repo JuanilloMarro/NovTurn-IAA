@@ -37,7 +37,7 @@ export default function PasoContrasena() {
             <AvisoError>{error}</AvisoError>
 
             <CampoTexto
-                etiqueta="Contraseña · algo que sé"
+                etiqueta="Contraseña"
                 icono={Lock}
                 type={visible ? 'text' : 'password'}
                 value={password}

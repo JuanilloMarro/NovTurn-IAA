@@ -17,7 +17,7 @@ function hora(fecha) {
 }
 
 export default function Panel() {
-    const { perfil, factores, aal } = useAuthStore();
+    const { perfil, factores } = useAuthStore();
     const { rol, descripcion, verBitacora } = usePermisos();
     const { cerrarSesion } = useFlujoAcceso();
 
@@ -56,8 +56,7 @@ export default function Panel() {
                         {descripcion}
                     </p>
                     <p className="text-[11px] text-gray-400 font-medium mt-4">
-                        {perfil?.full_name} · nivel de garantía{' '}
-                        <span className="font-bold text-emerald-700">{(aal ?? 'aal2').toUpperCase()}</span>
+                        {perfil?.full_name}
                     </p>
                 </div>
 
@@ -99,18 +98,16 @@ export default function Panel() {
                         Permisos concedidos
                     </h3>
                     <div className="flex flex-wrap gap-2 mb-5">
-                        {Object.entries(perfil?.permissions ?? {}).map(([clave, valor]) => (
-                            <Badge key={clave} tone={valor ? 'exito' : 'fallo'}>
-                                {clave.replace(/_/g, ' ')}
-                            </Badge>
-                        ))}
+                        {Object.entries(perfil?.permissions ?? {})
+                            .filter(([, valor]) => valor)
+                            .map(([clave]) => (
+                                <Badge key={clave} tone="exito">
+                                    {clave.replace(/_/g, ' ')}
+                                </Badge>
+                            ))}
                     </div>
-                    <p className="text-[11px] text-gray-500 font-medium leading-relaxed mb-5">
-                        Estos permisos se leen de <code className="text-navy-700">app_roles.permissions</code> en
-                        la base de datos. El frontend nunca decide por el nombre del rol.
-                    </p>
 
-                    {verBitacora ? (
+                    {verBitacora && (
                         <Link
                             to="/bitacora"
                             className="inline-flex items-center gap-2 bg-navy-700 hover:bg-navy-900 text-white text-[12px] font-bold px-5 py-3 rounded-full shadow-btn hover:shadow-btn-hover transition-all"
@@ -118,11 +115,6 @@ export default function Panel() {
                             <ScrollText size={14} strokeWidth={2.5} />
                             Ver la bitácora de accesos
                         </Link>
-                    ) : (
-                        <p className="text-[11px] text-gray-400 font-medium">
-                            Tu rol no incluye el permiso <code>ver_bitacora</code>. La ruta{' '}
-                            <code>/bitacora</code> te devolvería acá.
-                        </p>
                     )}
                 </div>
             </div>

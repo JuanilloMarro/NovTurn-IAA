@@ -130,11 +130,6 @@ export default function Bitacora() {
                     )}
                 </div>
 
-                <p className="text-[10px] text-gray-400 font-medium text-center mt-5 leading-relaxed">
-                    La autorización no es sólo la interfaz: la política RLS de <code>access_log</code> aplica
-                    la misma regla en la base. Con un rol sin <code>ver_bitacora</code>, esta consulta
-                    devuelve cero filas.
-                </p>
             </div>
         </div>
     );

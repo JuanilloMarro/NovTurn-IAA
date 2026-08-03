@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Mail } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useFlujoAcceso } from '../../hooks/useFlujoAcceso';
-import { MODO_DEMO } from '../../config/supabase';
 import { AvisoError, BotonPrincipal, CampoTexto } from './piezas';
 
 /**
@@ -39,13 +38,6 @@ export default function PasoIdentificacion() {
             <BotonPrincipal type="submit" cargando={cargando}>
                 Continuar
             </BotonPrincipal>
-
-            {MODO_DEMO && (
-                <p className="text-[10px] text-gray-400 font-medium text-center leading-relaxed pt-1">
-                    Modo demostración: el sistema confirma si el identificador existe.
-                    En producción esta respuesta sería genérica.
-                </p>
-            )}
         </form>
     );
 }

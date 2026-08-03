@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
 import { useFlujoAcceso } from '../hooks/useFlujoAcceso';
 import IndicadorProgreso from '../components/acceso/IndicadorProgreso';
@@ -14,23 +13,23 @@ import PasoTotp from '../components/acceso/PasoTotp';
 const TEXTOS = {
     identificacion: {
         titulo: 'Identificación',
-        descripcion: 'Primero el sistema necesita saber quién decís ser. Todavía no se comprueba nada.',
+        descripcion: 'Ingresá tu identificador para comenzar.',
     },
     contrasena: {
-        titulo: 'Primer factor · algo que sé',
-        descripcion: 'Ahora sí empieza la autenticación: probá que conocés la contraseña de esta cuenta.',
+        titulo: 'Contraseña',
+        descripcion: 'Ingresá la contraseña de tu cuenta.',
     },
     biometria: {
-        titulo: 'Segundo factor · algo que soy',
-        descripcion: 'Verificá tu identidad con la biometría del dispositivo.',
+        titulo: 'Biometría',
+        descripcion: 'Verificá tu identidad con el dispositivo.',
     },
     totp: {
-        titulo: 'Tercer factor · algo que tengo',
-        descripcion: 'Ingresá el código de tu autenticador para elevar la sesión a AAL2.',
+        titulo: 'Autenticador',
+        descripcion: 'Ingresá el código de tu aplicación de autenticación.',
     },
     autorizacion: {
         titulo: 'Autorización',
-        descripcion: 'Los tres factores están superados. Determinando el rol y los permisos…',
+        descripcion: 'Verificando tus permisos…',
     },
 };
 
@@ -52,18 +51,9 @@ export default function Acceso() {
     const { titulo, descripcion } = TEXTOS[paso] ?? TEXTOS.identificacion;
 
     return (
-        <TarjetaAcceso
-            titulo={titulo}
-            descripcion={descripcion}
-            pie={
-                <Link
-                    to="/enrolamiento"
-                    className="text-[11px] font-semibold text-navy-700/50 hover:text-navy-900 transition-colors"
-                >
-                    Registrar mis factores de autenticación
-                </Link>
-            }
-        >
+        // Ya no hay enlace al registro de factores: se llega ahí desde el paso
+        // de contraseña, nunca por fuera del proceso.
+        <TarjetaAcceso titulo={titulo} descripcion={descripcion}>
             <IndicadorProgreso />
 
             {paso === 'identificacion' && <PasoIdentificacion />}

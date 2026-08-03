@@ -10,7 +10,7 @@ import { AvisoError, BotonPrincipal, CampoTexto } from './piezas';
  */
 export default function PasoTotp() {
     const [codigo, setCodigo] = useState('');
-    const { error, cargando, aal } = useAuthStore();
+    const { error, cargando } = useAuthStore();
     const { verificarTotp } = useFlujoAcceso();
 
     function enviar(e) {
@@ -23,21 +23,8 @@ export default function PasoTotp() {
         <form onSubmit={enviar} className="space-y-5">
             <AvisoError>{error}</AvisoError>
 
-            <div className="flex items-center justify-center gap-2 mb-1">
-                <span className="text-[10px] font-bold text-navy-900/40 tracking-wide uppercase">
-                    Nivel de garantía
-                </span>
-                <span className="text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-200/70 rounded-full px-2.5 py-0.5">
-                    {(aal ?? 'aal1').toUpperCase()}
-                </span>
-                <span className="text-[10px] text-gray-400">→</span>
-                <span className="text-[11px] font-bold text-gray-400 bg-white/40 border border-white/60 rounded-full px-2.5 py-0.5">
-                    AAL2
-                </span>
-            </div>
-
             <CampoTexto
-                etiqueta="Código del autenticador · algo que tengo"
+                etiqueta="Código de seis dígitos"
                 icono={Smartphone}
                 type="text"
                 inputMode="numeric"
@@ -57,7 +44,7 @@ export default function PasoTotp() {
             </BotonPrincipal>
 
             <p className="text-[10px] text-gray-400 font-medium text-center leading-relaxed pt-1">
-                Código de seis dígitos de Google Authenticator. Cambia cada 30 segundos.
+                El código cambia cada 30 segundos.
             </p>
         </form>
     );
