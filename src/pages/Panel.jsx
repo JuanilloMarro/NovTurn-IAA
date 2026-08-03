@@ -22,7 +22,7 @@ export default function Panel() {
     const { cerrarSesion } = useFlujoAcceso();
 
     return (
-        <div className="min-h-[100dvh] safe-area-card py-10 px-4 font-sans relative overflow-hidden">
+        <div className="min-h-[100dvh] safe-area-card py-6 sm:py-10 font-sans relative overflow-hidden">
             <div className="lg-orb hidden sm:block w-[500px] h-[500px] top-[-15%] right-[-10%] animate-float opacity-70" />
 
             <div className="relative z-10 max-w-3xl mx-auto animate-fade-up">

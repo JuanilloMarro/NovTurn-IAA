@@ -2,7 +2,14 @@
 <html lang="es">
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <!-- `viewport-fit=cover` es obligatorio para que `env(safe-area-inset-*)`
+             devuelva algo distinto de 0 en iOS. Sin esto, las reglas de área
+             segura de `index.css` no hacen nada y el contenido se mete debajo
+             del notch y del indicador de inicio. -->
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+        />
         <title>Acceso Seguro</title>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
